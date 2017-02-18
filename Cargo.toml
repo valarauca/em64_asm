@@ -1,0 +1,7 @@
+[package]
+name = "amd64_asm"
+version = "0.1.0"
+authors = ["Wlaeder"]
+
+[dependencies]
+nom = "2.1.0"
