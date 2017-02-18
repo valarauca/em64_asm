@@ -314,7 +314,23 @@ gen_reg!{
  bp => "bp" => Bit16 => X86 => X86 => 5,
  di => "di" => Bit16 => X86 => X86 => 7,
  sp => "sp" => Bit16 => X86 => X86 => 4,
- si => "si" => Bit16 => X86 => X86 => 6
+ si => "si" => Bit16 => X86 => X86 => 6,
+ st0 => "st0" => Bit80 => X87 => X86 => 0, 
+ st1 => "st1" => Bit80 => X87 => X86 => 1,
+ st2 => "st2" => Bit80 => X87 => X86 => 2,
+ st3 => "st3" => Bit80 => X87 => X86 => 3, 
+ st4 => "st4" => Bit80 => X87 => X86 => 4,
+ st5 => "st5" => Bit80 => X87 => X86 => 5,
+ st6 => "st6" => Bit80 => X87 => X86 => 6, 
+ st7 => "st7" => Bit80 => X87 => X86 => 7,
+ mmx0 => "mmx0" => BitMMX => MMX => X86 => 0,
+ mmx1 => "mmx1" => BitMMX => MMX => X86 => 1,
+ mmx2 => "mmx2" => BitMMX => MMX => X86 => 2,
+ mmx3 => "mmx3" => BitMMX => MMX => X86 => 3,
+ mmx4 => "mmx4" => BitMMX => MMX => X86 => 4,
+ mmx5 => "mmx5" => BitMMX => MMX => X86 => 5,
+ mmx6 => "mmx6" => BitMMX => MMX => X86 => 6,
+ mmx7 => "mmx7" => BitMMX => MMX => X86 => 7
 }
 
 macro_rules! generate_parser {
@@ -455,6 +471,34 @@ generate_parser!{@PREFIXED
     b"zmm0" => zmm0
   };
 }
+generate_parser!{@PREFIXED
+  Name: parse_mmx_reg;
+  Prefix: b"mmx";
+  Val: {
+    b"mmx0" => mmx0,
+    b"mmx1" => mmx1,
+    b"mmx2" => mmx2,
+    b"mmx3" => mmx3,
+    b"mmx4" => mmx4,
+    b"mmx5" => mmx5,
+    b"mmx6" => mmx6,
+    b"mmx7" => mmx7
+  };
+}
+generate_parser!{@PREFIXED
+  Name: parse_x87_reg;
+  Prefix: b"st";
+  Val: {
+    b"st0" => st0,
+    b"st1" => st1,
+    b"st2" => st2,
+    b"st3" => st3,
+    b"st4" => st4,
+    b"st5" => st5,
+    b"st6" => st6,
+    b"st7" => st7
+  };
+}
 generate_parser!{
   Name: parse_8bit_reg;
   Val: {
@@ -549,16 +593,19 @@ generate_parser!{
 /*
  * Special Parsers
  */
-named!(pub parse_vec_ref<Register>, do_parse!(
+named!(pub parse_vec_reg<Register>, do_parse!(
   val: alt!(
     parse_512bit_reg |
     parse_256bit_reg |
-    parse_128bit_reg
+    parse_128bit_reg |
+    parse_mmx_reg 
   ) >>
   (val)
 ));    
 named!(pub parse_reg<Register>, do_parse!(
   val: alt!(
+    parse_mmx_reg |
+    parse_x87_reg |
     parse_512bit_reg |
     parse_256bit_reg |
     parse_128bit_reg |
@@ -569,7 +616,7 @@ named!(pub parse_reg<Register>, do_parse!(
   ) >>
   (val)
 ));
-named!(pub parse_long_mod_reg<Register>, do_parse!(
+named!(pub parse_long_ptr_reg<Register>, do_parse!(
   val: alt!(
     parse_16bit_reg |
     parse_32bit_reg |
