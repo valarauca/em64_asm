@@ -5,3 +5,4 @@ authors = ["Wlaeder"]
 
 [dependencies]
 nom = "2.1.0"
+fnv = "1.0.5"
