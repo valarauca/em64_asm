@@ -27,4 +27,7 @@ pub use self::scale::{
 };
 
 mod disp;
-pub use self::disp::Disp;
+pub use self::disp::{
+  Disp,
+  parse_const
+};

@@ -11,7 +11,7 @@ use std::i16;
 use std::i32;
 use std::i64;
 use std::str;
-
+use std::mem;
 
 #[derive(Copy,Clone,Debug,PartialEq,Eq)]
 pub enum Disp {
@@ -213,6 +213,28 @@ impl Disp {
         Option::None => return x,
         Option::Some(z) => x = z
       }
+    }
+  }
+
+  pub fn to_slice<'a>(&'a self) -> &'a [u8] {
+    match self {
+      &Disp::None => b"",
+      &Disp::I8(ref val) => {
+        let mut tup: (&i8, usize) = (val,1);
+        unsafe{ mem::transmute(tup) }
+      },
+      &Disp::I16(ref val) => {
+        let mut tup: (&i16, usize) = (val,2);
+        unsafe{ mem::transmute(tup) }
+      },
+      &Disp::I32(ref val) => {
+        let mut tup: (&i32, usize) = (val,4);
+        unsafe{ mem::transmute(tup) }
+      },
+      &Disp::I64(ref val) => {
+        let mut tup: (&i64, usize) = (val,8);
+        unsafe{ mem::transmute(tup) }
+      },
     }
   }
 }
