@@ -1,12 +1,5 @@
 
 
-mod arch;
-pub use self::arch::{
-  Arch,
-  Generic,
-  Haswell,
-  Boardwell,
-};
 
 mod encoding;
 

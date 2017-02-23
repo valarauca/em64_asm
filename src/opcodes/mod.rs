@@ -13,26 +13,45 @@ use super::args::{
   Disp,
   Register,
   Mem,
+  RegSize,
 };
 
 use super::platform::{
-  Arch,
   Encode,
   Ext,
-  Generic
 };
 
 mod a;
 
-pub trait Opcode<Arch>: Sized+Clone {
-  fn nop_after(&self) -> bool;
-  fn max_uops(&self) -> usize;
-  fn min_uops(&self) -> usize;
-  fn encode(&self, x: &mut Vec<u8>);
+/// Details how the Opcode is encoded
+pub trait Opcode {
+
+  /// How many uOPs is the instruction
+  fn u_op_count(&self) -> usize;
+
+  /// How many bytes is this instruction
+  fn len(&self) -> Result<usize,()>;
+
+  /// If this is a branch this lets you set its offset
+  fn set_offset(&mut self, x: Disp) -> Result<(),()>;
+  
+  /// Should a NOP be encoded after this
+  fn is_nop_after(&self) -> bool;
+
+  /// Does this have a Length Change Prefix
+  fn is_lcp(&self) -> bool;
+
+  /// Does this encode a large DISP/IMM data which
+  /// may go over a cache line
+  fn is_large_uop(&self) -> bool;
+
+  /// Is a branch
+  fn is_branch(&self) -> bool;
+  
+  /// I have no clue how to handle this
+  fn is_external_call(&self) -> bool;
+
+  /// Encode the operation into a buffer
+  fn encode_op(&self, buffer: &mut Vec<u8>) -> Result<(),()>;
 }
 
-
-#[derive(Clone)]
-pub struct Op<A: Arch,O: Opcode<A>> {
-  data: O,
-}
